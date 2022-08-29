@@ -1,2 +1,2 @@
-# user ıd : test@test.com
-# password : test
+# Username : test@test.com
+# Password : test
