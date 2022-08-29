@@ -1,0 +1,178 @@
+<div class="content-wrapper">
+  <!-- Content Header (Page header) -->
+  <section class="content-header">
+    <div class="container-fluid">
+      <div class="row mb-2">
+        <div class="col-sm-6">
+          <h1>Ana Sayfa</h1>
+        </div>
+        <div class="col-sm-6">
+          <ol class="breadcrumb float-sm-right">
+            <li class="breadcrumb-item active"><a routerLink="/">Ana Sayfa</a></li>
+          </ol>
+        </div>
+      </div>
+    </div>
+  </section>
+
+
+  <section class="content">
+
+
+    <div class="card">
+      <div class="card-header">
+        <h3 class="card-title">Kitaplar</h3>
+
+        <div class="card-tools">
+          <button type="button" class="btn btn-tool" data-card-widget="collapse" title="Collapse">
+            <i class="fas fa-minus"></i>
+          </button>
+          <button type="button" class="btn btn-tool" data-card-widget="remove" title="Remove">
+            <i class="fas fa-times"></i>
+          </button>
+        </div>
+      </div>
+      <div class="card-body">
+        <div class="form-group">
+          <input class="form-control" [(ngModel)]="filterText" placeholder="Aranacak kelimeyi yazın">
+        </div>
+        <div class="row">
+          <div class="col-md-4" *ngFor="let book of books | bookFilterHomePipe:filterText">
+            <div class="form-group img-group text-center">
+              <img class="mt-4" src="https://bookshopping.angulareducation.com/assets/img/{{ book.imageUrl }}" alt="">
+              <h4 class="text-danger"
+              (click)="getListByBook(book.id)"
+              data-bs-toggle="modal"
+              data-bs-target="#rentaBookListModal"
+              ><a href="#">{{ book.name }}</a></h4>
+              <h5>{{ book.writer }}</h5>
+              <h5>{{ book.publishDate | date:'dd.MM.yyyy' }}</h5>
+              <h4 class="alert alert-success" *ngIf="book.isAvailable">Müsait</h4>
+              <button
+              *ngIf="book.isAvailable"
+              (click)="bookId = book.id"
+              data-bs-toggle="modal"
+              data-bs-target="#rentABookModal"
+              class="btn btn-info mb-4">
+                <i class="fa-solid fa-book"></i>
+                 Kirala
+              </button>
+              <h4 class="alert alert-danger" *ngIf="!book.isAvailable">Kiralandı!</h4>
+              <button [swal]="returnBookSwal" (confirm)="returnBook(book)" *ngIf="!book.isAvailable" class="btn btn-warning mb-4" (click)="bookId = book.id">
+                <i class="fa-solid fa-arrow-rotate-left"></i>
+                 Teslim Al
+              </button>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div class="card-footer">
+      </div>
+
+    </div>
+  </section>
+
+  <section  class="content">
+    <div class="card">
+      <div class="card-header">
+        <h3 class="card-title">Kitapların Kiralanma Oranları</h3>
+
+        <div class="card-tools">
+          <button type="button" class="btn btn-tool" data-card-widget="collapse" title="Collapse">
+            <i class="fas fa-minus"></i>
+          </button>
+          <button type="button" class="btn btn-tool" data-card-widget="remove" title="Remove">
+            <i class="fas fa-times"></i>
+          </button>
+        </div>
+      </div>
+      <div class="card-body">
+        <div style="height:600px;width:600px;">
+          <canvas id="myChart"></canvas></div>
+
+      </div>
+
+      <div class="card-footer">
+      </div>
+
+    </div>
+  </section>
+</div>
+
+
+<!-- Modal -->
+<div class="modal fade" id="rentABookModal" tabindex="-1" aria-hidden="true">
+  <div class="modal-dialog">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h5 class="modal-title" id="exampleModalLabel">Kitap Kirala</h5>
+        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close">
+          <i class="fa-solid fa-xmark"></i>
+        </button>
+      </div>
+      <div class="modal-body">
+        <div class="form-group">
+          <label>Kiralayan Adı</label>
+          <input type="text" required [(ngModel)]="name" autocomplete="off" class="form-control">
+        </div>
+        <div class="form-group">
+          <label>Telefon Numarası</label>
+          <input type="text" required [(ngModel)]="tel" autocomplete="off" class="form-control">
+        </div>
+      </div>
+      <div class="modal-footer">
+        <button type="button" class="btn btn-info" (click)="rentABook()">Kirala</button>
+        <button type="button" class="btn btn-secondary mx-4" id="closeModal" data-bs-dismiss="modal">Kapat</button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- Modal -->
+<div class="modal fade" id="rentaBookListModal" tabindex="-1" aria-hidden="true">
+  <div class="modal-dialog modal-lg">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h5 class="modal-title" id="exampleModalLabel">Kitap Kiralama Detayları</h5>
+        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close">
+          <i class="fa-solid fa-xmark"></i>
+        </button>
+      </div>
+      <div class="modal-body">
+        <table class="table">
+          <thead>
+            <tr>
+              <th>#</th>
+              <th>Kiralayan Adı</th>
+              <th>Telefon</th>
+              <th>Kiralama Tarihi</th>
+              <th>İade Tarihi</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr *ngFor="let leaseTerm of leaseTerms let index = index">
+              <td>{{ index +1 }}</td>
+              <td>{{ leaseTerm.landmanName }}</td>
+              <td>{{ leaseTerm.landmanTel }}</td>
+              <td>{{ leaseTerm.rentDate | date:'dd.MM.yyyy' }}</td>
+              <td>{{ leaseTerm.returnDate | date:'dd.MM.yyyy' }}</td>
+            </tr>
+          </tbody>
+        </table>
+    </div>
+    <div class="modal-footer">
+      <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Kapat</button>
+    </div>
+  </div>
+</div>
+
+
+<swal
+#returnBookSwal
+title="Teslim Al?"
+text="Kitap teslim alınacak onaylıyor musunuz?"
+type="question"
+[showCancelButton]="true"
+[swalOptions]="{confirmButtonText: 'Onayla', cancelButtonText: 'Vazgeç'}"
+></swal>

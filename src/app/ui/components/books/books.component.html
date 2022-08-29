@@ -1,0 +1,164 @@
+<div class="content-wrapper">
+  <!-- Content Header (Page header) -->
+  <div class="content-header">
+    <div class="container-fluid">
+      <div class="row mb-2">
+        <div class="col-sm-6">
+          <h1 class="m-0">Kitaplar</h1>
+        </div>
+        <div class="col-sm-6">
+          <ol class="breadcrumb float-sm-right">
+            <li class="breadcrumb-item"><a routerLink="/">Ana Sayfa</a></li>
+            <li class="breadcrumb-item active">Kitaplar</li>
+          </ol>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <section class="content">
+
+    <!-- Default box -->
+    <div class="card">
+      <div class="card-header">
+        <h3 class="card-title">Kitap Listesi</h3>
+
+        <div class="card-tools">
+          <button type="button" class="btn btn-tool" data-card-widget="collapse" title="Collapse">
+            <i class="fas fa-minus"></i>
+          </button>
+          <button type="button" class="btn btn-tool" data-card-widget="remove" title="Remove">
+            <i class="fas fa-times"></i>
+          </button>
+        </div>
+      </div>
+      <div class="card-body">
+        <div class="row">
+          <div class="col-md-9">
+            <button (click)="exportExcel()" class="btn btn-info">
+              <i class="fa-solid fa-file-excel"></i>
+              Excel'e İndir
+            </button>
+            <button class="btn btn-primary mx-2" routerLink="/books/add">
+              <i class="fa-solid fa-plus"></i>
+              Kitap Ekle
+            </button>
+          </div>
+          <div class="col-md-3">
+            <input class="form-control" [(ngModel)]="filterText" placeholder="Aranacak bir kelime yazın">
+          </div>
+        </div>
+
+        <div class="form-group mt-4">
+          <table id="excel-table" class="table">
+            <thead>
+              <tr>
+                <th>#</th>
+                <th>Resim</th>
+                <th>Kitap Adı</th>
+                <th>Yazar Adı</th>
+                <th>Yayınlanma Tarihi</th>
+                <th>Aktif Durumu</th>
+                <th>Kira Durumu</th>
+                <th>İşlemler</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr *ngFor="let book of books | bookFilterPipe:filterText let index = index">
+                <td>{{ index +1 }}</td>
+                <td><img src="https://bookshopping.angulareducation.com/assets/img/{{ book.imageUrl }}" alt=""></td>
+                <td>{{ book.name }}</td>
+                <td>{{ book.writer }}</td>
+                <td>{{ book.publishDate | date:'dd.MM.yyyy' }}</td>
+                <td>
+                  <h4>
+                    <span *ngIf="book.isActive" class="badge bg-success">Aktif</span>
+                    <span *ngIf="!book.isActive" class="badge bg-danger">Pasif</span>
+                  </h4>
+                </td>
+                <td>
+                  <h4>
+                    <span *ngIf="book.isAvailable" class="badge bg-success">Aktif</span>
+                    <span *ngIf="!book.isAvailable" class="badge bg-danger">Pasif</span>
+                  </h4>
+                </td>
+                <td>
+                  <button
+                  data-bs-toggle="modal"
+                  data-bs-target="#rentaBookListModal"
+                  (click)="getListByBook(book.id)"
+                  class="btn btn-sm btn-info">
+                  <i class="fa-solid fa-rectangle-list"></i>
+                    Detay
+                  </button>
+                  <button [routerLink]="['/books','update',book.guid]"  class="btn btn-sm btn-warning mx-2">
+                    <i class="fa-solid fa-pen-to-square"></i>
+                    Güncelle
+                  </button>
+                  <button [swal]="deleteSwal" (confirm)="deleteBook(book)" class="btn btn-sm btn-danger mx-2">
+                    <i class="fa-solid fa-trash-arrow-up"></i>
+                    Sil
+                  </button>
+                </td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+      </div>
+      <!-- /.card-body -->
+      <div class="card-footer">
+
+      </div>
+      <!-- /.card-footer-->
+    </div>
+    <!-- /.card -->
+
+  </section>
+
+</div>
+
+<div class="modal fade" id="rentaBookListModal" tabindex="-1" aria-hidden="true">
+  <div class="modal-dialog modal-lg">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h5 class="modal-title" id="exampleModalLabel">Kitap Kiralama Detayları</h5>
+        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close">
+          <i class="fa-solid fa-xmark"></i>
+        </button>
+      </div>
+      <div class="modal-body">
+        <table class="table">
+          <thead>
+            <tr>
+              <th>#</th>
+              <th>Kiralayan Adı</th>
+              <th>Telefon</th>
+              <th>Kiralama Tarihi</th>
+              <th>İade Tarihi</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr *ngFor="let leaseTerm of leaseTerms let index = index">
+              <td>{{ index +1 }}</td>
+              <td>{{ leaseTerm.landmanName }}</td>
+              <td>{{ leaseTerm.landmanTel }}</td>
+              <td>{{ leaseTerm.rentDate | date:'dd.MM.yyyy' }}</td>
+              <td>{{ leaseTerm.returnDate | date:'dd.MM.yyyy' }}</td>
+            </tr>
+          </tbody>
+        </table>
+    </div>
+    <div class="modal-footer">
+      <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Kapat</button>
+    </div>
+  </div>
+</div>
+
+<swal
+#deleteSwal
+title="Sil?"
+text="Kitabı silmek istiyor musunuz?"
+type="question"
+[showCancelButton]="true"
+[swalOptions]="{confirmButtonText: 'Sil', cancelButtonText: 'Vazgeç'}"
+></swal>
